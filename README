@@ -8,69 +8,81 @@ Step 2: Produce a Docker Compose YAML file to run the job from a Container
 
 
 Step 3:  Production-ready System Diagram
+Below is a production-ready system diagram for designing and coding a Spark job that ingests one or multiple CSV files
+into Delta Lake, produces a Docker Compose YAML file to run the job from a container, and deploys the solution on
+Azure cloud service with job orchestration:
 
-                               +-------------------+
-                               |                   |
-                               |   DeltaLake Table |
-                               |                   |
-                               +--------+----------+
-                                        |
-                                        |
-                                        |
-                               +--------v----------+
-                               |                   |
-                               |   Spark Job       |
-                               |                   |
-                               +--------+----------+
-                                        |
-                                        |
-                                        |
-                               +--------v----------+
-                               |                   |
-                               | SparkHistoryServer|
-                               |                   |
-                               +--------+----------+
-                                        |
-                                        |
-                                        |
-                               +--------v----------+
-                               |                   |
-                               |  Docker Container |
-                               |  (Spark Job)      |
-                               |                   |
-                               +--------+----------+
-                                        |
-                                        |
-                                        |
-                               +--------v----------+
-                               |                   |
-                               |  Docker Container |
-                               |(SparkHistoryServer)|
-                               |                   |
-                               +--------+----------+
-                                        |
-                                        |
-                                        |
-                               +--------v----------+
-                               |                   |
-                               |  Docker Container |
-                               |   (DeltaLake)     |
-                               |                   |
-                               +--------+----------+
-                                        |
-                                        |
-                                        |
-                               +--------v------------+
-                               |                     |
-                               |    Kubernetes)      |
-                               |                     |
-                               +---------------------+
+                                      +-------------------+
+                                      |                   |
+                                      |    Azure Blob     |
+                                      |    Storage        |
+                                      |                   |
+                                      +-------------------+
+                                                |
+                                                v
+                                      +-------------------+
+                                      |                   |
+                                      |    Spark Job      |
+                                      |    (Apache Spark) |
+                                      |                   |
+                                      +-------------------+
+                                                |
+                                                v
+                                      +-------------------+
+                                      |                   |
+                                      |   Delta Lake      |
+                                      |   (Data Lake)     |
+                                      |                   |
+                                      +-------------------+
+                                                |
+                                                v
+                                      +-------------------+
+                                      |                   |
+                                      |  Docker Container |
+                                      |                   |
+                                      +-------------------+
+                                                |
+                                                v
+                                      +-------------------+
+                                      |                   |
+                                      | Docker Compose    |
+                                      |   YAML File       |
+                                      |                   |
+                                      +-------------------+
+                                                |
+                                                v
+                                      +-------------------+
+                                      |                   |
+                                      | Azure Container   |
+                                      |  Instances (ACI)  |
+                                      |  or Azure Kubernetes|
+                                      |  Service (AKS)    |
+                                      |                   |
+                                      +-------------------+
+                                                |
+                                                v
+                                      +-------------------+
+                                      |                   |
+                                      | Job Orchestration |
+                                      |  (e.g. Airflow)   |
+                                      |                   |
+                                      +-------------------+
 
-In this system diagram, the Spark Job, SparkHistoryServer, and DeltaLake are deployed as Docker containers within a
-Kubernetes cluster. The Spark Job container reads CSV files, adds additional columns, and writes the data to
-DeltaLake table. The SparkHistoryServer container provides a web-based UI for monitoring Spark applications.
-The DeltaLake container stores the DeltaLake table.
+The system design includes the following components:
 
-The Docker containers are orchestrated and managed by Kubernetes, providing scalability, fault tolerance, and
-easy management of the Spark Job and DeltaLake table. The Dockerfile builds the Docker image for the
-Spark Job container.
+- Azure Blob Storage: This is where the CSV files are stored, and it provides scalable and cost-effective storage for
+unstructured data.
+- Spark Job: The Spark job is developed using Apache Spark and reads CSV files from Azure Blob Storage,
+performs data transformations, and writes data into Delta Lake for ACID transactions and schema evolution.
+- Docker Container: The Spark job and its dependencies are packaged into a Docker container, providing portability and
+consistency across environments.
+- Docker Compose YAML File: A YAML file defines the services, networks, and volumes needed to run the Spark job container,
+allowing for easy deployment and scaling.
+- Azure Container Instances (ACI) or Azure Kubernetes Service (AKS): The Docker container can be deployed as ACI or AKS,
+providing serverless or containerized deployment options with orchestration and scaling capabilities.
+- Job Orchestration: Apache Airflow can be used to schedule, monitor, and coordinate the Spark job, handling failures and
+ensuring reliable execution as per the desired schedule.
+
+In summary, the system design allows for ingesting CSV files into Delta Lake using Spark, containerizing the job with
+Docker, deploying the solution on Azure with ACI or AKS, and orchestrating the job with Airflow for efficient and
+reliable data processing.
