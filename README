@@ -1,0 +1,76 @@
+Step 2: Produce a Docker Compose YAML file to run the job from a Container
+
+- Build the docker image using the command below:
+>docker build -t cfpartners .
+
+- Start the docker-compose.yml
+>docker-compose up
+
+
+Step 3:  Production-ready System Diagram
+
+                               +-------------------+
+                               |                   |
+                               |   DeltaLake Table |
+                               |                   |
+                               +--------+----------+
+                                        |
+                                        |
+                                        |
+                               +--------v----------+
+                               |                   |
+                               |   Spark Job       |
+                               |                   |
+                               +--------+----------+
+                                        |
+                                        |
+                                        |
+                               +--------v----------+
+                               |                   |
+                               | SparkHistoryServer|
+                               |                   |
+                               +--------+----------+
+                                        |
+                                        |
+                                        |
+                               +--------v----------+
+                               |                   |
+                               |  Docker Container |
+                               |  (Spark Job)      |
+                               |                   |
+                               +--------+----------+
+                                        |
+                                        |
+                                        |
+                               +--------v----------+
+                               |                   |
+                               |  Docker Container |
+                               |(SparkHistoryServer)|
+                               |                   |
+                               +--------+----------+
+                                        |
+                                        |
+                                        |
+                               +--------v----------+
+                               |                   |
+                               |  Docker Container |
+                               |   (DeltaLake)     |
+                               |                   |
+                               +--------+----------+
+                                        |
+                                        |
+                                        |
+                               +--------v------------+
+                               |                     |
+                               |    Kubernetes)      |
+                               |                     |
+                               +---------------------+
+
+In this system diagram, the Spark Job, SparkHistoryServer, and DeltaLake are deployed as Docker containers within a
+Kubernetes cluster. The Spark Job container reads CSV files, adds additional columns, and writes the data to
+DeltaLake table. The SparkHistoryServer container provides a web-based UI for monitoring Spark applications.
+The DeltaLake container stores the DeltaLake table.
+
+The Docker containers are orchestrated and managed by Kubernetes, providing scalability, fault tolerance, and
+easy management of the Spark Job and DeltaLake table. The Dockerfile builds the Docker image for the
+Spark Job container.

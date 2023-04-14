@@ -1,0 +1,7 @@
+version: "3"
+services:
+  spark-job:
+    build: .
+  spark-history-server:
+    image: apache/spark
+    command: /opt/spark/bin/spark-class -Dspark.history.fs.logDirectory=/var/log/spark/apps org.apache.spark.deploy.history.HistoryServer
